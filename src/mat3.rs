@@ -2,9 +2,11 @@ use crate::matrix::Matrix;
 use crate::utils::EPSILON;
 
 pub type Mat3 = [f32; 9];
+pub type Vec3 = [f32; 3];
 
 impl Matrix for Mat3 {
-    type Type = Self;
+    type MatrixType = Mat3;
+    type VectorType = Vec3;
 
     fn zeros() -> Self {
         [0., 0., 0., 0., 0., 0., 0., 0., 0.]
@@ -16,7 +18,7 @@ impl Matrix for Mat3 {
         [1., 0., 0., 0., 1., 0., 0., 0., 1.]
     }
 
-    fn copy_to(&self, dst: &mut Self::Type) {
+    fn copy_to(&self, dst: &mut Self) {
         dst[0] = self[0];
         dst[1] = self[1];
         dst[2] = self[2];
@@ -74,6 +76,27 @@ impl Matrix for Mat3 {
         self[8] = lhs20 * rhs02 + lhs21 * rhs12 + lhs22 * rhs22;
 
         self
+    }
+
+    fn mul_vector(&self, rhs: &Vec3) -> Vec3 {
+        let x = rhs[0];
+        let y = rhs[1];
+        let w = rhs[2];
+        [
+            self[0] * x + self[1] * y + self[2] * w,
+            self[3] * x + self[4] * y + self[5] * w,
+            self[6] * x + self[7] * y + self[8] * w,
+        ]
+    }
+    fn mul_vector_left(&self, lhs: &Vec3) -> Vec3 {
+        let x = lhs[0];
+        let y = lhs[1];
+        let w = lhs[2];
+        [
+            self[0] * x + self[3] * y + self[6] * w,
+            self[1] * x + self[4] * y + self[7] * w,
+            self[2] * x + self[5] * y + self[8] * w,
+        ]
     }
 
     fn add(mut self, rhs: &Self) -> Self {
@@ -190,6 +213,17 @@ impl Matrix for Mat3 {
         self[6] = v10 * v21 - v11 * v20;
         self[7] = v01 * v20 - v00 * v21;
         self[8] = v00 * v11 - v01 * v10;
+
+        self
+    }
+
+    fn translate(mut self, direction: &Vec3) -> Self {
+        let x = direction[0] / direction[2];
+        let y = direction[1] / direction[2];
+
+        self[6] += x * self[0] + y * self[3];
+        self[7] += x * self[1] + y * self[4];
+        self[8] += x * self[2] + y * self[5];
 
         self
     }
@@ -332,5 +366,32 @@ mod tests {
         let a = [1., 3., 2., 4., 2., 8., 9., 2., 7.];
         let b = [-2., -17., 20., 44., -11., 0., -10., 25., -10.];
         assert_eq!(a.adjugate(), b);
+    }
+
+    #[test]
+    fn mat3_mul_vector() {
+        let a = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
+        let b = [11., 12., 13.];
+
+        let c = a.mul_vector(&b);
+        assert_eq!(c, [74., 182., 290.]);
+    }
+
+    #[test]
+    fn mat3_mul_vector_left() {
+        let a = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
+        let b = [11., 12., 13.];
+
+        let c = a.mul_vector_left(&b);
+        assert_eq!(c, [150., 186., 222.]);
+    }
+
+    #[test]
+    fn mat3_translate() {
+        let d = [3., -5., 1.];
+        let m = Mat3::identity().translate(&d);
+
+        let a = [-3., 5., 1.];
+        assert_eq!(m.mul_vector_left(&a), [0., 0., 1.]);
     }
 }

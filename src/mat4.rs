@@ -3,9 +3,11 @@ use crate::utils::EPSILON;
 use std::f32;
 
 pub type Mat4 = [f32; 16];
+pub type Vec4 = [f32; 4];
 
 impl Matrix for Mat4 {
-    type Type = Self;
+    type MatrixType = Mat4;
+    type VectorType = Vec4;
 
     fn zeros() -> Self {
         [0.; 16]
@@ -104,6 +106,30 @@ impl Matrix for Mat4 {
         self[15] = v0 * r03 + v1 * r13 + v2 * r23 + v3 * r33;
 
         self
+    }
+    fn mul_vector(&self, rhs: &Vec4) -> Vec4 {
+        let x = rhs[0];
+        let y = rhs[1];
+        let z = rhs[2];
+        let w = rhs[3];
+        [
+            self[0] * x + self[1] * y + self[2] * z + self[3] * w,
+            self[4] * x + self[5] * y + self[6] * z + self[7] * w,
+            self[8] * x + self[9] * y + self[10] * z + self[11] * w,
+            self[12] * x + self[13] * y + self[14] * z + self[15] * w,
+        ]
+    }
+    fn mul_vector_left(&self, lhs: &Vec4) -> Vec4 {
+        let x = lhs[0];
+        let y = lhs[1];
+        let z = lhs[2];
+        let w = lhs[3];
+        [
+            self[0] * x + self[4] * y + self[8] * z + self[12] * w,
+            self[1] * x + self[5] * y + self[9] * z + self[13] * w,
+            self[2] * x + self[6] * y + self[10] * z + self[14] * w,
+            self[3] * x + self[7] * y + self[11] * z + self[15] * w,
+        ]
     }
     fn add(mut self, rhs: &Self) -> Self {
         for i in 0..16 {
@@ -272,6 +298,19 @@ impl Matrix for Mat4 {
             + v30 * (v01 * v12 - v02 * v11));
         self[15] = v00 * (v11 * v22 - v12 * v21) - v10 * (v01 * v22 - v02 * v21)
             + v20 * (v01 * v12 - v02 * v11);
+
+        self
+    }
+
+    fn translate(mut self, direction: &Vec4) -> Self {
+        let x = direction[0] / direction[3];
+        let y = direction[1] / direction[3];
+        let z = direction[2] / direction[3];
+
+        self[12] += self[0] * x + self[4] * y + self[8] * z;
+        self[13] += self[1] * x + self[5] * y + self[9] * z;
+        self[14] += self[2] * x + self[6] * y + self[10] * z;
+        self[15] += self[3] * x + self[7] * y + self[11] * z;
 
         self
     }
@@ -577,5 +616,36 @@ mod tests {
             -484., -103.,
         ];
         assert_eq!(a.adjugate(), b);
+    }
+
+    #[test]
+    fn mat4_mul_vector() {
+        let a = [
+            1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
+        ];
+        let b = [17., 18., 19., 20.];
+
+        let c = a.mul_vector(&b);
+        assert_eq!(c, [190., 486., 782., 1078.]);
+    }
+
+    #[test]
+    fn mat4_mul_vector_left() {
+        let a = [
+            1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
+        ];
+        let b = [17., 18., 19., 20.];
+
+        let c = a.mul_vector_left(&b);
+        assert_eq!(c, [538., 612., 686., 760.]);
+    }
+
+    #[test]
+    fn mat4_translate() {
+        let d = [3., -5., 7., 1.];
+        let m = Mat4::identity().translate(&d);
+
+        let a = [-3., 5., -7., 1.];
+        assert_eq!(m.mul_vector_left(&a), [0., 0., 0., 1.]);
     }
 }
