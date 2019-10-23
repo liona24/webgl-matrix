@@ -1,5 +1,6 @@
 use crate::matrix::Matrix;
 use crate::utils::EPSILON;
+use std::f32;
 
 pub type Mat4 = [f32; 16];
 
@@ -273,6 +274,115 @@ impl Matrix for Mat4 {
             + v20 * (v01 * v12 - v02 * v11);
 
         self
+    }
+}
+
+pub trait ProjectionMatrix {
+    fn create_perspective(fov_y: f32, aspect_ratio: f32, near: f32, far: f32) -> Mat4;
+    fn create_perspective_from_viewport(
+        vp_left: f32,
+        vp_right: f32,
+        vp_top: f32,
+        vp_bot: f32,
+        near: f32,
+        far: f32,
+    ) -> Mat4;
+
+    fn create_orthogonal_from_viewport(
+        vp_left: f32,
+        vp_right: f32,
+        vp_top: f32,
+        vp_bot: f32,
+        near: f32,
+        far: f32,
+    ) -> Mat4;
+}
+
+impl ProjectionMatrix for Mat4 {
+    fn create_perspective(fov_y: f32, aspect_ratio: f32, near: f32, far: f32) -> Self {
+        let f = 1. / (fov_y / 2.).tan();
+        let nf = 1. / (near - far);
+        [
+            f / aspect_ratio,
+            0.,
+            0.,
+            0.,
+            0.,
+            f,
+            0.,
+            0.,
+            0.,
+            0.,
+            (far + near) * nf,
+            -1.,
+            0.,
+            0.,
+            2. * far * near * nf,
+            0.,
+        ]
+    }
+    fn create_perspective_from_viewport(
+        vp_left: f32,
+        vp_right: f32,
+        vp_top: f32,
+        vp_bot: f32,
+        near: f32,
+        far: f32,
+    ) -> Self {
+        let wi = 1. / (vp_right - vp_left);
+        let hi = 1. / (vp_top - vp_bot);
+        let nf = 1. / (near - far);
+
+        [
+            near * 2. * wi,
+            0.,
+            0.,
+            0.,
+            0.,
+            near * 2. * hi,
+            0.,
+            0.,
+            (vp_right + vp_left) * wi,
+            (vp_top + vp_bot) * hi,
+            (far + near) * nf,
+            -1.,
+            0.,
+            0.,
+            far * near * 2. * nf,
+            0.,
+        ]
+    }
+
+    fn create_orthogonal_from_viewport(
+        vp_left: f32,
+        vp_right: f32,
+        vp_top: f32,
+        vp_bot: f32,
+        near: f32,
+        far: f32,
+    ) -> Self {
+        let wi = 1. / (vp_right - vp_left);
+        let hi = 1. / (vp_top - vp_bot);
+        let nf = 1. / (near - far);
+
+        [
+            2. * wi,
+            0.,
+            0.,
+            0.,
+            0.,
+            2. * hi,
+            0.,
+            0.,
+            0.,
+            0.,
+            2. * nf,
+            0.,
+            -(vp_left + vp_right) * wi,
+            -(vp_top + vp_bot) * hi,
+            (far + near) * nf,
+            1.,
+        ]
     }
 }
 
