@@ -2,7 +2,7 @@ mod matrix;
 
 #[cfg(feature = "Matrix3")]
 mod mat3;
-#[cfg(feature = "Matrix4")]
+#[cfg(feature = "Matrix3")]
 pub use mat3::Mat3;
 
 #[cfg(feature = "Matrix4")]
