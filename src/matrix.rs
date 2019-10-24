@@ -45,4 +45,7 @@ pub trait Matrix {
 
     /// Translate this matrix into the given direction
     fn translate(self, direction : &Self::VectorType) -> Self::MatrixType;
+
+    /// Rotate this matrix by the given angle (radians) around the given axis
+    fn rotate(self, angle : f32, axis : &Self::VectorType) -> Self::MatrixType;
 }

@@ -1,5 +1,6 @@
 use crate::matrix::Matrix;
 use crate::utils::EPSILON;
+use std::f32;
 
 pub type Mat3 = [f32; 9];
 pub type Vec3 = [f32; 3];
@@ -227,6 +228,28 @@ impl Matrix for Mat3 {
 
         self
     }
+
+    /// Rotate the matrix around the Z-axis.
+    /// The `axis` argument is ignored.
+    fn rotate(mut self, angle: f32, _: &Vec3) -> Self {
+        let v00 = self[0];
+        let v01 = self[1];
+        let v02 = self[2];
+        let v10 = self[3];
+        let v11 = self[4];
+        let v12 = self[5];
+
+        let (s, c) = angle.sin_cos();
+
+        self[0] = c * v00 + s * v10;
+        self[1] = c * v01 + s * v11;
+        self[2] = c * v02 + s * v12;
+        self[3] = c * v10 - s * v00;
+        self[4] = c * v11 - s * v01;
+        self[5] = c * v12 - s * v02;
+
+        self
+    }
 }
 
 #[cfg(test)]
@@ -393,5 +416,14 @@ mod tests {
 
         let a = [-3., 5., 1.];
         assert_eq!(m.mul_vector_left(&a), [0., 0., 1.]);
+    }
+
+    #[test]
+    fn mat3_rotate() {
+        let m = Mat3::identity().rotate(f32::consts::FRAC_PI_2, &[0.; 3]);
+        let v = [-1., 3., 1.];
+
+        let r = m.mul_vector_left(&v);
+        assert!(almost_eq(&r, &[-3., -1., 1.]));
     }
 }

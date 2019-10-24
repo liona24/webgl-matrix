@@ -314,6 +314,64 @@ impl Matrix for Mat4 {
 
         self
     }
+
+    fn rotate(mut self, angle: f32, axis: &Vec4) -> Self {
+        let mut x = axis[0] / axis[3];
+        let mut y = axis[1] / axis[3];
+        let mut z = axis[2] / axis[3];
+
+        let len = (x * x + y * y + z * z).sqrt();
+
+        // no rotation around nothing
+        assert!(len.abs() > EPSILON);
+
+        x /= len;
+        y /= len;
+        z /= len;
+
+        let (s, c) = angle.sin_cos();
+        let t = 1. - c;
+
+        let v00 = self[0];
+        let v01 = self[1];
+        let v02 = self[2];
+        let v03 = self[3];
+        let v10 = self[4];
+        let v11 = self[5];
+        let v12 = self[6];
+        let v13 = self[7];
+        let v20 = self[8];
+        let v21 = self[9];
+        let v22 = self[10];
+        let v23 = self[11];
+
+        let rot00 = x * x * t + c;
+        let rot01 = y * x * t + z * s;
+        let rot02 = z * x * t - y * s;
+
+        let rot10 = x * y * t - z * s;
+        let rot11 = y * y * t + c;
+        let rot12 = z * y * t + x * s;
+
+        let rot20 = x * z * t + y * s;
+        let rot21 = y * z * t - x * s;
+        let rot22 = z * z * t + c;
+
+        self[0] =  v00 * rot00 + v10 * rot01 + v20 * rot02;
+        self[1] =  v01 * rot00 + v11 * rot01 + v21 * rot02;
+        self[2] =  v02 * rot00 + v12 * rot01 + v22 * rot02;
+        self[3] =  v03 * rot00 + v13 * rot01 + v23 * rot02;
+        self[4] =  v00 * rot10 + v10 * rot11 + v20 * rot12;
+        self[5] =  v01 * rot10 + v11 * rot11 + v21 * rot12;
+        self[6] =  v02 * rot10 + v12 * rot11 + v22 * rot12;
+        self[7] =  v03 * rot10 + v13 * rot11 + v23 * rot12;
+        self[8] =  v00 * rot20 + v10 * rot21 + v20 * rot22;
+        self[9] =  v01 * rot20 + v11 * rot21 + v21 * rot22;
+        self[10] = v02 * rot20 + v12 * rot21 + v22 * rot22;
+        self[11] = v03 * rot20 + v13 * rot21 + v23 * rot22;
+
+        self
+    }
 }
 
 pub trait ProjectionMatrix {
@@ -647,5 +705,32 @@ mod tests {
 
         let a = [-3., 5., -7., 1.];
         assert_eq!(m.mul_vector_left(&a), [0., 0., 0., 1.]);
+    }
+
+    #[test]
+    fn mat4_rotate_x() {
+        let m = Mat4::identity().rotate(f32::consts::FRAC_PI_2, &[1., 0., 0., 1.]);
+        let v = [-1., 3., 5., 1.];
+
+        let r = m.mul_vector_left(&v);
+        assert!(almost_eq(&r, &[-1., -5., 3., 1.]));
+    }
+
+    #[test]
+    fn mat4_rotate_y() {
+        let m = Mat4::identity().rotate(f32::consts::FRAC_PI_2, &[0., 1., 0., 1.]);
+        let v = [-1., 3., 5., 1.];
+
+        let r = m.mul_vector_left(&v);
+        assert!(almost_eq(&r, &[5., 3., 1., 1.]));
+    }
+
+    #[test]
+    fn mat4_rotate_z() {
+        let m = Mat4::identity().rotate(f32::consts::FRAC_PI_2, &[0., 0., 1., 1.]);
+        let v = [-1., 3., 5., 1.];
+
+        let r = m.mul_vector_left(&v);
+        assert!(almost_eq(&r, &[-3., -1., 5., 1.]));
     }
 }
