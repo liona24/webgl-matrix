@@ -1,9 +1,9 @@
 use crate::matrix::Matrix;
 use crate::utils::EPSILON;
+use crate::vec4::Vec4;
 use std::f32;
 
 pub type Mat4 = [f32; 16];
-pub type Vec4 = [f32; 4];
 
 impl Matrix for Mat4 {
     type MatrixType = Mat4;
@@ -323,7 +323,10 @@ impl Matrix for Mat4 {
         let len = (x * x + y * y + z * z).sqrt();
 
         // no rotation around nothing
-        assert!(len.abs() > EPSILON);
+        if len.abs() <= EPSILON {
+            debug_assert!(len.abs() > EPSILON);
+            return self;
+        }
 
         x /= len;
         y /= len;

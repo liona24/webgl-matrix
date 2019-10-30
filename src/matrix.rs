@@ -1,3 +1,4 @@
+/// The base Matrix trait
 pub trait Matrix {
     type MatrixType;
     type VectorType;
