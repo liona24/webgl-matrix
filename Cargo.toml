@@ -11,7 +11,9 @@ keywords = ["matrix", "webgl", "lightweight", "wasm", "no-std"]
 [dependencies]
 
 [features]
-default = ["Matrix4", "Matrix3"]
+default = ["Matrix4", "Matrix3", "Vector3", "Vector4"]
 
-Matrix4 = []
-Matrix3 = []
+Vector4 = []
+Vector3 = []
+Matrix4 = ["Vector4"]
+Matrix3 = ["Vector3"]

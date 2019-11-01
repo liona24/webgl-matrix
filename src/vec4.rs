@@ -1,4 +1,7 @@
+#[cfg(feature = "Matrix4")]
 use crate::mat4::Mat4;
+#[cfg(feature = "Matrix4")]
+use crate::vector::MulVectorMatrix;
 use crate::vector::Vector;
 use std::f32;
 
@@ -6,7 +9,6 @@ pub type Vec4 = [f32; 4];
 
 impl Vector for Vec4 {
     type VectorType = Vec4;
-    type MatrixType = Mat4;
 
     fn zeros() -> Self::VectorType {
         [0., 0., 0., 0.]
@@ -23,34 +25,6 @@ impl Vector for Vec4 {
         self[1] *= rhs[1];
         self[2] *= rhs[2];
         self[3] *= rhs[3];
-
-        self
-    }
-
-    fn mul_matrix_left(mut self, lhs: &Self::MatrixType) -> Self::VectorType {
-        let x = self[0];
-        let y = self[1];
-        let z = self[2];
-        let w = self[3];
-
-        self[0] = lhs[0] * x + lhs[1] * y + lhs[2] * z + lhs[3] * w;
-        self[1] = lhs[4] * x + lhs[5] * y + lhs[6] * z + lhs[7] * w;
-        self[2] = lhs[8] * x + lhs[9] * y + lhs[10] * z + lhs[11] * w;
-        self[3] = lhs[12] * x + lhs[13] * y + lhs[14] * z + lhs[15] * w;
-
-        self
-    }
-
-    fn mul_matrix(mut self, rhs: &Self::MatrixType) -> Self::VectorType {
-        let x = self[0];
-        let y = self[1];
-        let z = self[2];
-        let w = self[3];
-
-        self[0] = rhs[0] * x + rhs[4] * y + rhs[8] * z + rhs[12] * w;
-        self[1] = rhs[1] * x + rhs[5] * y + rhs[9] * z + rhs[13] * w;
-        self[2] = rhs[2] * x + rhs[6] * y + rhs[10] * z + rhs[14] * w;
-        self[3] = rhs[3] * x + rhs[7] * y + rhs[11] * z + rhs[15] * w;
 
         self
     }
@@ -114,12 +88,47 @@ impl Vector for Vec4 {
     }
 }
 
+#[cfg(feature = "Matrix4")]
+impl MulVectorMatrix for Vec4 {
+    type VectorType = Vec4;
+    type MatrixType = Mat4;
+
+    fn mul_matrix_left(mut self, lhs: &Self::MatrixType) -> Self::VectorType {
+        let x = self[0];
+        let y = self[1];
+        let z = self[2];
+        let w = self[3];
+
+        self[0] = lhs[0] * x + lhs[1] * y + lhs[2] * z + lhs[3] * w;
+        self[1] = lhs[4] * x + lhs[5] * y + lhs[6] * z + lhs[7] * w;
+        self[2] = lhs[8] * x + lhs[9] * y + lhs[10] * z + lhs[11] * w;
+        self[3] = lhs[12] * x + lhs[13] * y + lhs[14] * z + lhs[15] * w;
+
+        self
+    }
+
+    fn mul_matrix(mut self, rhs: &Self::MatrixType) -> Self::VectorType {
+        let x = self[0];
+        let y = self[1];
+        let z = self[2];
+        let w = self[3];
+
+        self[0] = rhs[0] * x + rhs[4] * y + rhs[8] * z + rhs[12] * w;
+        self[1] = rhs[1] * x + rhs[5] * y + rhs[9] * z + rhs[13] * w;
+        self[2] = rhs[2] * x + rhs[6] * y + rhs[10] * z + rhs[14] * w;
+        self[3] = rhs[3] * x + rhs[7] * y + rhs[11] * z + rhs[15] * w;
+
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::utils::almost_eq;
 
     #[test]
+    #[cfg(feature = "Matrix4")]
     fn vec4_mul_matrix_left() {
         let a = [
             1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
@@ -131,6 +140,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "Matrix4")]
     fn vec4_mul_matrix() {
         let a = [
             1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,

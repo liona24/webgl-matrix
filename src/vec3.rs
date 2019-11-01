@@ -1,4 +1,7 @@
+#[cfg(feature = "Matrix3")]
 use crate::mat3::Mat3;
+#[cfg(feature = "Matrix3")]
+use crate::vector::MulVectorMatrix;
 use crate::vector::Vector;
 use std::f32;
 
@@ -6,7 +9,6 @@ pub type Vec3 = [f32; 3];
 
 impl Vector for Vec3 {
     type VectorType = Vec3;
-    type MatrixType = Mat3;
 
     fn zeros() -> Self::VectorType {
         [0., 0., 0.]
@@ -22,30 +24,6 @@ impl Vector for Vec3 {
         self[0] *= rhs[0];
         self[1] *= rhs[1];
         self[2] *= rhs[2];
-
-        self
-    }
-
-    fn mul_matrix_left(mut self, lhs: &Self::MatrixType) -> Self::VectorType {
-        let x = self[0];
-        let y = self[1];
-        let z = self[2];
-
-        self[0] = lhs[0] * x + lhs[1] * y + lhs[2] * z;
-        self[1] = lhs[3] * x + lhs[4] * y + lhs[5] * z;
-        self[2] = lhs[6] * x + lhs[7] * y + lhs[8] * z;
-
-        self
-    }
-
-    fn mul_matrix(mut self, rhs: &Self::MatrixType) -> Self::VectorType {
-        let x = self[0];
-        let y = self[1];
-        let z = self[2];
-
-        self[0] = rhs[0] * x + rhs[3] * y + rhs[6] * z;
-        self[1] = rhs[1] * x + rhs[4] * y + rhs[7] * z;
-        self[2] = rhs[2] * x + rhs[5] * y + rhs[8] * z;
 
         self
     }
@@ -103,12 +81,43 @@ impl Vector for Vec3 {
     }
 }
 
+#[cfg(feature = "Matrix3")]
+impl MulVectorMatrix for Vec3 {
+    type VectorType = Vec3;
+    type MatrixType = Mat3;
+
+    fn mul_matrix_left(mut self, lhs: &Self::MatrixType) -> Self::VectorType {
+        let x = self[0];
+        let y = self[1];
+        let z = self[2];
+
+        self[0] = lhs[0] * x + lhs[1] * y + lhs[2] * z;
+        self[1] = lhs[3] * x + lhs[4] * y + lhs[5] * z;
+        self[2] = lhs[6] * x + lhs[7] * y + lhs[8] * z;
+
+        self
+    }
+
+    fn mul_matrix(mut self, rhs: &Self::MatrixType) -> Self::VectorType {
+        let x = self[0];
+        let y = self[1];
+        let z = self[2];
+
+        self[0] = rhs[0] * x + rhs[3] * y + rhs[6] * z;
+        self[1] = rhs[1] * x + rhs[4] * y + rhs[7] * z;
+        self[2] = rhs[2] * x + rhs[5] * y + rhs[8] * z;
+
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::utils::almost_eq;
 
     #[test]
+    #[cfg(feature = "Matrix3")]
     fn vec3_mul_matrix_left() {
         let a = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
         let b = [11., 12., 13.];
@@ -118,6 +127,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "Matrix3")]
     fn vec3_mul_matrix() {
         let a = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
         let b = [11., 12., 13.];
