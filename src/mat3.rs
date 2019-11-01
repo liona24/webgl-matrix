@@ -31,7 +31,7 @@ impl Matrix for Mat3 {
         dst[8] = self[8];
     }
 
-    fn transpose(mut self) -> Self {
+    fn transpose(&mut self) -> &mut Self {
         let v01 = self[1];
         let v02 = self[2];
         let v12 = self[5];
@@ -45,7 +45,7 @@ impl Matrix for Mat3 {
         self
     }
 
-    fn mul(mut self, rhs: &Self) -> Self {
+    fn mul(&mut self, rhs: &Self) -> &mut Self {
         let lhs00 = self[0];
         let lhs01 = self[1];
         let lhs02 = self[2];
@@ -100,7 +100,7 @@ impl Matrix for Mat3 {
         ]
     }
 
-    fn add(mut self, rhs: &Self) -> Self {
+    fn add(&mut self, rhs: &Self) -> &mut Self {
         self[0] += rhs[0];
         self[1] += rhs[1];
         self[2] += rhs[2];
@@ -114,7 +114,7 @@ impl Matrix for Mat3 {
         self
     }
 
-    fn sub(mut self, rhs: &Self) -> Self {
+    fn sub(&mut self, rhs: &Self) -> &mut Self {
         self[0] -= rhs[0];
         self[1] -= rhs[1];
         self[2] -= rhs[2];
@@ -128,7 +128,7 @@ impl Matrix for Mat3 {
         self
     }
 
-    fn scale(mut self, factor: f32) -> Self {
+    fn scale(&mut self, factor: f32) -> &mut Self {
         self[0] *= factor;
         self[1] *= factor;
         self[2] *= factor;
@@ -142,7 +142,7 @@ impl Matrix for Mat3 {
         self
     }
 
-    fn inverse(mut self) -> Option<Self> {
+    fn inverse(&mut self) -> Option<&mut Self> {
         let v00 = self[0];
         let v01 = self[1];
         let v02 = self[2];
@@ -194,7 +194,7 @@ impl Matrix for Mat3 {
             + v02 * (v21 * v10 - v11 * v20)
     }
 
-    fn adjugate(mut self) -> Self {
+    fn adjugate(&mut self) -> &mut Self {
         let v00 = self[0];
         let v01 = self[1];
         let v02 = self[2];
@@ -218,7 +218,7 @@ impl Matrix for Mat3 {
         self
     }
 
-    fn translate(mut self, direction: &Vec3) -> Self {
+    fn translate(&mut self, direction: &Vec3) -> &mut Self {
         let x = direction[0] / direction[2];
         let y = direction[1] / direction[2];
 
@@ -231,7 +231,7 @@ impl Matrix for Mat3 {
 
     /// Rotate the matrix around the Z-axis.
     /// The `axis` argument is ignored.
-    fn rotate(mut self, angle: f32, _: &Vec3) -> Self {
+    fn rotate(&mut self, angle: f32, _: &Vec3) -> &mut Self {
         let v00 = self[0];
         let v01 = self[1];
         let v02 = self[2];
@@ -305,7 +305,8 @@ mod tests {
         // 1 4 7
         // 2 5 8
         // 3 6 9
-        let a = ([1., 2., 3., 4., 5., 6., 7., 8., 9.] as Mat3).transpose();
+        let mut a = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
+        a.transpose();
         let b: Mat3 = [1., 4., 7., 2., 5., 8., 3., 6., 9.];
 
         assert_eq!(a, b);
@@ -313,53 +314,54 @@ mod tests {
 
     #[test]
     fn mat3_mul() {
-        let a: Mat3 = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
+        let mut a: Mat3 = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
         let b: Mat3 = [11., 12., 13., 14., 15., 16., 17., 18., 19.];
 
         let c: Mat3 = [90., 96., 102., 216., 231., 246., 342., 366., 390.];
 
-        assert_eq!(a.mul(&b), c);
+        assert_eq!(a.mul(&b), &c);
     }
 
     #[test]
     fn mat3_mul_identity() {
         let a = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
-        let b = Mat3::identity();
+        let mut b = Mat3::identity();
 
-        assert_eq!(b.mul(&a), a);
+        assert_eq!(b.mul(&a), &a);
     }
 
     #[test]
     fn mat3_add() {
-        let a = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
+        let mut a = [1., 2., 3., 4., 5., 6., 7., 8., 9.];
         let b = [11., 12., 13., 14., 15., 16., 17., 18., 19.];
 
         let c = [12., 14., 16., 18., 20., 22., 24., 26., 28.];
 
-        assert_eq!(a.add(&b), c);
+        assert_eq!(a.add(&b), &c);
     }
 
     #[test]
     fn mat3_sub() {
-        let a = [9., 8., 7., 6., 5., 4., 3., 2., 1.];
+        let mut a = [9., 8., 7., 6., 5., 4., 3., 2., 1.];
         let b = [11., 12., 13., 14., 15., 16., 17., 18., 19.];
 
         let c = [-2., -4., -6., -8., -10., -12., -14., -16., -18.];
 
-        assert_eq!(a.sub(&b), c);
+        assert_eq!(a.sub(&b), &c);
     }
 
     #[test]
     fn mat3_scale() {
-        let a = [9., 8., 7., 6., 5., 4., 3., 2., 1.];
+        let mut a = [9., 8., 7., 6., 5., 4., 3., 2., 1.];
         let b = [18., 16., 14., 12., 10., 8., 6., 4., 2.];
 
-        assert_eq!(a.scale(2.0), b);
+
+        assert_eq!(a.scale(2.0), &b);
     }
 
     #[test]
     fn mat3_inverse_valid() {
-        let a = [1., 3., 2., 4., 2., 8., 9., 2., 7.];
+        let mut a = [1., 3., 2., 4., 2., 8., 9., 2., 7.];
         let b = a.clone();
 
         let a = a.inverse().expect("Inverse should exist");
@@ -367,14 +369,14 @@ mod tests {
         let inv = [
             -0.01818, -0.15455, 0.18182, 0.4, -0.1, 0.0, -0.09091, 0.22727, -0.09091,
         ];
-        assert!(almost_eq(&inv, &a));
+        assert!(almost_eq(&inv, a));
 
-        assert!(almost_eq(&a.mul(&b), &Mat3::identity()));
+        assert!(almost_eq(a.mul(&b), &Mat3::identity()));
     }
 
     #[test]
     fn mat3_inverse_invalid() {
-        let a = [9., 8., 7., 6., 5., 4., 3., 2., 1.];
+        let mut a = [9., 8., 7., 6., 5., 4., 3., 2., 1.];
         assert_eq!(a.inverse(), None);
     }
 
@@ -386,9 +388,9 @@ mod tests {
 
     #[test]
     fn mat3_adjugate() {
-        let a = [1., 3., 2., 4., 2., 8., 9., 2., 7.];
+        let mut a = [1., 3., 2., 4., 2., 8., 9., 2., 7.];
         let b = [-2., -17., 20., 44., -11., 0., -10., 25., -10.];
-        assert_eq!(a.adjugate(), b);
+        assert_eq!(a.adjugate(), &b);
     }
 
     #[test]
@@ -412,7 +414,8 @@ mod tests {
     #[test]
     fn mat3_translate() {
         let d = [3., -5., 1.];
-        let m = Mat3::identity().translate(&d);
+        let mut m = Mat3::identity();
+        m.translate(&d);
 
         let a = [-3., 5., 1.];
         assert_eq!(m.mul_vector_left(&a), [0., 0., 1.]);
@@ -420,7 +423,9 @@ mod tests {
 
     #[test]
     fn mat3_rotate() {
-        let m = Mat3::identity().rotate(f32::consts::FRAC_PI_2, &[0.; 3]);
+        let mut m = Mat3::identity();
+        m.rotate(f32::consts::FRAC_PI_2, &[0.; 3]);
+
         let v = [-1., 3., 1.];
 
         let r = m.mul_vector_left(&v);

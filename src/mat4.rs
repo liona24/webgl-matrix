@@ -27,7 +27,7 @@ impl Matrix for Mat4 {
         }
     }
 
-    fn transpose(mut self) -> Self {
+    fn transpose(&mut self) -> &mut Self {
         let v01 = self[1];
         let v02 = self[2];
         let v03 = self[3];
@@ -51,7 +51,7 @@ impl Matrix for Mat4 {
         self
     }
 
-    fn mul(mut self, rhs: &Self) -> Self {
+    fn mul(&mut self, rhs: &Self) -> &mut Self {
         let r00 = rhs[0];
         let r01 = rhs[1];
         let r02 = rhs[2];
@@ -131,14 +131,14 @@ impl Matrix for Mat4 {
             self[3] * x + self[7] * y + self[11] * z + self[15] * w,
         ]
     }
-    fn add(mut self, rhs: &Self) -> Self {
+    fn add(&mut self, rhs: &Self) -> &mut Self {
         for i in 0..16 {
             self[i] += rhs[i];
         }
 
         self
     }
-    fn sub(mut self, rhs: &Self) -> Self {
+    fn sub(&mut self, rhs: &Self) -> &mut Self {
         for i in 0..16 {
             self[i] -= rhs[i];
         }
@@ -146,7 +146,7 @@ impl Matrix for Mat4 {
         self
     }
 
-    fn scale(mut self, factor: f32) -> Self {
+    fn scale(&mut self, factor: f32) -> &mut Self {
         for i in 0..16 {
             self[i] *= factor;
         }
@@ -154,7 +154,7 @@ impl Matrix for Mat4 {
         self
     }
 
-    fn inverse(mut self) -> Option<Self> {
+    fn inverse(&mut self) -> Option<&mut Self> {
         let v00 = self[0];
         let v01 = self[1];
         let v02 = self[2];
@@ -248,7 +248,7 @@ impl Matrix for Mat4 {
             + tmp05 * tmp06
     }
 
-    fn adjugate(mut self) -> Self {
+    fn adjugate(&mut self) -> &mut Self {
         let v00 = self[0];
         let v01 = self[1];
         let v02 = self[2];
@@ -302,7 +302,7 @@ impl Matrix for Mat4 {
         self
     }
 
-    fn translate(mut self, direction: &Vec4) -> Self {
+    fn translate(&mut self, direction: &Vec4) -> &mut Self {
         let x = direction[0] / direction[3];
         let y = direction[1] / direction[3];
         let z = direction[2] / direction[3];
@@ -315,7 +315,7 @@ impl Matrix for Mat4 {
         self
     }
 
-    fn rotate(mut self, angle: f32, axis: &Vec4) -> Self {
+    fn rotate(&mut self, angle: f32, axis: &Vec4) -> &mut Self {
         let mut x = axis[0] / axis[3];
         let mut y = axis[1] / axis[3];
         let mut z = axis[2] / axis[3];
@@ -549,10 +549,10 @@ mod tests {
         //  2  6 10 14
         //  3  7 11 15
         //  4  8 12 16
-        let a = ([
+        let mut a = [
             1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
-        ] as Mat4)
-            .transpose();
+        ];
+        a.transpose();
         let b = [
             1., 5., 9., 13., 2., 6., 10., 14., 3., 7., 11., 15., 4., 8., 12., 16.,
         ];
@@ -562,7 +562,7 @@ mod tests {
 
     #[test]
     fn mat4_mul() {
-        let a = [
+        let mut a = [
             1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
         ];
         let b = [
@@ -574,7 +574,7 @@ mod tests {
             1122., 1180.,
         ];
 
-        assert_eq!(a.mul(&b), c);
+        assert_eq!(a.mul(&b), &c);
     }
 
     #[test]
@@ -582,14 +582,14 @@ mod tests {
         let a = [
             1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
         ];
-        let b = Mat4::identity();
+        let mut b = Mat4::identity();
 
-        assert_eq!(b.mul(&a), a);
+        assert_eq!(b.mul(&a), &a);
     }
 
     #[test]
     fn mat4_add() {
-        let a = [
+        let mut a = [
             1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
         ];
         let b = [
@@ -600,12 +600,12 @@ mod tests {
             12., 14., 16., 18., 20., 22., 24., 26., 28., 30., 32., 34., 36., 38., 40., 42.,
         ];
 
-        assert_eq!(a.add(&b), c);
+        assert_eq!(a.add(&b), &c);
     }
 
     #[test]
     fn mat4_sub() {
-        let a = [
+        let mut a = [
             16., 15., 14., 13., 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1.,
         ];
         let b = [
@@ -616,29 +616,29 @@ mod tests {
             5., 3., 1., -1., -3., -5., -7., -9., -11., -13., -15., -17., -19., -21., -23., -25.,
         ];
 
-        assert_eq!(a.sub(&b), c);
+        assert_eq!(a.sub(&b), &c);
     }
 
     #[test]
     fn mat4_scale() {
-        let a = [
+        let mut a = [
             16., 15., 14., 13., 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1.,
         ];
         let b = [
             32., 30., 28., 26., 24., 22., 20., 18., 16., 14., 12., 10., 8., 6., 4., 2.,
         ];
 
-        assert_eq!(a.scale(2.0), b);
+        assert_eq!(a.scale(2.0), &b);
     }
 
     #[test]
     fn mat4_inverse_valid() {
-        let a = [
+        let mut a = [
             3., 4., 1., 2., 3., 6., 10., 12., 2., 7., 3., 14., 16., 4., 8., 18.,
         ];
         let b = a.clone();
 
-        let a = a.inverse().expect("Inverse should exist");
+        a.inverse().expect("Inverse should exist");
 
         let inv = [
             0.0976342, -0.0401802, -0.0548254, 0.0585805, 0.2482163, 0.0093879, 0.0221555,
@@ -648,12 +648,12 @@ mod tests {
 
         assert!(almost_eq(&inv, &a));
 
-        assert!(almost_eq(&a.mul(&b), &Mat4::identity()));
+        assert!(almost_eq(a.mul(&b), &Mat4::identity()));
     }
 
     #[test]
     fn mat4_inverse_invalid() {
-        let a = [
+        let mut a = [
             1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
         ];
         assert_eq!(a.inverse(), None);
@@ -669,14 +669,14 @@ mod tests {
 
     #[test]
     fn mat4_adjugate() {
-        let a = [
+        let mut a = [
             3., 4., 1., 2., 3., 6., 10., 12., 2., 7., 3., 14., 16., 4., 8., 18.,
         ];
         let b = [
             -520., 214., 292., -312., -1322., -50., -118., 272., 90., -754., 564., 54., 716., 156.,
             -484., -103.,
         ];
-        assert_eq!(a.adjugate(), b);
+        assert_eq!(a.adjugate(), &b);
     }
 
     #[test]
@@ -704,7 +704,8 @@ mod tests {
     #[test]
     fn mat4_translate() {
         let d = [3., -5., 7., 1.];
-        let m = Mat4::identity().translate(&d);
+        let mut m = Mat4::identity();
+        m.translate(&d);
 
         let a = [-3., 5., -7., 1.];
         assert_eq!(m.mul_vector_left(&a), [0., 0., 0., 1.]);
@@ -712,7 +713,8 @@ mod tests {
 
     #[test]
     fn mat4_rotate_x() {
-        let m = Mat4::identity().rotate(f32::consts::FRAC_PI_2, &[1., 0., 0., 1.]);
+        let mut m = Mat4::identity();
+        m.rotate(f32::consts::FRAC_PI_2, &[1., 0., 0., 1.]);
         let v = [-1., 3., 5., 1.];
 
         let r = m.mul_vector_left(&v);
@@ -721,7 +723,8 @@ mod tests {
 
     #[test]
     fn mat4_rotate_y() {
-        let m = Mat4::identity().rotate(f32::consts::FRAC_PI_2, &[0., 1., 0., 1.]);
+        let mut m = Mat4::identity();
+        m.rotate(f32::consts::FRAC_PI_2, &[0., 1., 0., 1.]);
         let v = [-1., 3., 5., 1.];
 
         let r = m.mul_vector_left(&v);
@@ -730,7 +733,8 @@ mod tests {
 
     #[test]
     fn mat4_rotate_z() {
-        let m = Mat4::identity().rotate(f32::consts::FRAC_PI_2, &[0., 0., 1., 1.]);
+        let mut m = Mat4::identity();
+        m.rotate(f32::consts::FRAC_PI_2, &[0., 0., 1., 1.]);
         let v = [-1., 3., 5., 1.];
 
         let r = m.mul_vector_left(&v);
