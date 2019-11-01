@@ -4,7 +4,11 @@ mod vector;
 #[cfg(feature = "Matrix3")]
 mod mat3;
 #[cfg(feature = "Matrix3")]
+mod vec3;
+#[cfg(feature = "Matrix3")]
 pub use mat3::Mat3;
+#[cfg(feature = "Matrix3")]
+pub use vec3::Vec3;
 
 #[cfg(feature = "Matrix4")]
 mod mat4;
