@@ -79,20 +79,24 @@ impl Matrix for Mat3 {
         self
     }
 
-    fn mul_vector(&self, rhs: &Vec3) -> Vec3 {
+    fn mul_vector(&self, rhs: &[f32]) -> Vec3 {
+        debug_assert!(rhs.len() > 1);
+
         let x = rhs[0];
         let y = rhs[1];
-        let w = rhs[2];
+        let w = if rhs.len() > 2 { rhs[2] } else { 1. };
         [
             self[0] * x + self[1] * y + self[2] * w,
             self[3] * x + self[4] * y + self[5] * w,
             self[6] * x + self[7] * y + self[8] * w,
         ]
     }
-    fn mul_vector_left(&self, lhs: &Vec3) -> Vec3 {
+
+    fn mul_vector_left(&self, lhs: &[f32]) -> Vec3 {
+        debug_assert!(lhs.len() > 1);
         let x = lhs[0];
         let y = lhs[1];
-        let w = lhs[2];
+        let w = if lhs.len() > 2 { lhs[2] } else { 1. };
         [
             self[0] * x + self[3] * y + self[6] * w,
             self[1] * x + self[4] * y + self[7] * w,
@@ -218,9 +222,16 @@ impl Matrix for Mat3 {
         self
     }
 
-    fn translate(&mut self, direction: &Vec3) -> &mut Self {
-        let x = direction[0] / direction[2];
-        let y = direction[1] / direction[2];
+    fn translate(&mut self, direction: &[f32]) -> &mut Self {
+        debug_assert!(direction.len() > 1);
+
+        let mut x = direction[0];
+        let mut y = direction[1];
+
+        if direction.len() > 2 {
+            x /= direction[2];
+            y /= direction[2];
+        }
 
         self[6] += x * self[0] + y * self[3];
         self[7] += x * self[1] + y * self[4];
@@ -231,7 +242,7 @@ impl Matrix for Mat3 {
 
     /// Rotate the matrix around the Z-axis.
     /// The `axis` argument is ignored.
-    fn rotate(&mut self, angle: f32, _: &Vec3) -> &mut Self {
+    fn rotate(&mut self, angle: f32, _: &[f32]) -> &mut Self {
         let v00 = self[0];
         let v01 = self[1];
         let v02 = self[2];
@@ -354,7 +365,6 @@ mod tests {
     fn mat3_scale() {
         let mut a = [9., 8., 7., 6., 5., 4., 3., 2., 1.];
         let b = [18., 16., 14., 12., 10., 8., 6., 4., 2.];
-
 
         assert_eq!(a.scale(2.0), &b);
     }

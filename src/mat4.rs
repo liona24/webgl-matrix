@@ -107,11 +107,13 @@ impl Matrix for Mat4 {
 
         self
     }
-    fn mul_vector(&self, rhs: &Vec4) -> Vec4 {
+    fn mul_vector(&self, rhs: &[f32]) -> Vec4 {
+        debug_assert!(rhs.len() >= 3);
         let x = rhs[0];
         let y = rhs[1];
         let z = rhs[2];
-        let w = rhs[3];
+        let w = if rhs.len() > 3 { rhs[3] } else { 1. };
+
         [
             self[0] * x + self[1] * y + self[2] * z + self[3] * w,
             self[4] * x + self[5] * y + self[6] * z + self[7] * w,
@@ -119,11 +121,12 @@ impl Matrix for Mat4 {
             self[12] * x + self[13] * y + self[14] * z + self[15] * w,
         ]
     }
-    fn mul_vector_left(&self, lhs: &Vec4) -> Vec4 {
+    fn mul_vector_left(&self, lhs: &[f32]) -> Vec4 {
+        debug_assert!(lhs.len() >= 3);
         let x = lhs[0];
         let y = lhs[1];
         let z = lhs[2];
-        let w = lhs[3];
+        let w = if lhs.len() > 3 { lhs[3] } else { 1. };
         [
             self[0] * x + self[4] * y + self[8] * z + self[12] * w,
             self[1] * x + self[5] * y + self[9] * z + self[13] * w,
@@ -302,10 +305,18 @@ impl Matrix for Mat4 {
         self
     }
 
-    fn translate(&mut self, direction: &Vec4) -> &mut Self {
-        let x = direction[0] / direction[3];
-        let y = direction[1] / direction[3];
-        let z = direction[2] / direction[3];
+    fn translate(&mut self, direction: &[f32]) -> &mut Self {
+        debug_assert!(direction.len() >= 3);
+
+        let mut x = direction[0];
+        let mut y = direction[1];
+        let mut z = direction[2];
+
+        if direction.len() > 3 {
+            x /= direction[3];
+            y /= direction[3];
+            z /= direction[3];
+        }
 
         self[12] += self[0] * x + self[4] * y + self[8] * z;
         self[13] += self[1] * x + self[5] * y + self[9] * z;
@@ -315,10 +326,18 @@ impl Matrix for Mat4 {
         self
     }
 
-    fn rotate(&mut self, angle: f32, axis: &Vec4) -> &mut Self {
-        let mut x = axis[0] / axis[3];
-        let mut y = axis[1] / axis[3];
-        let mut z = axis[2] / axis[3];
+    fn rotate(&mut self, angle: f32, axis: &[f32]) -> &mut Self {
+        debug_assert!(axis.len() >= 3);
+
+        let mut x = axis[0];
+        let mut y = axis[1];
+        let mut z = axis[2];
+
+        if axis.len() > 3 {
+            x /= axis[3];
+            y /= axis[3];
+            z /= axis[3];
+        }
 
         let len = (x * x + y * y + z * z).sqrt();
 
@@ -360,16 +379,16 @@ impl Matrix for Mat4 {
         let rot21 = y * z * t - x * s;
         let rot22 = z * z * t + c;
 
-        self[0] =  v00 * rot00 + v10 * rot01 + v20 * rot02;
-        self[1] =  v01 * rot00 + v11 * rot01 + v21 * rot02;
-        self[2] =  v02 * rot00 + v12 * rot01 + v22 * rot02;
-        self[3] =  v03 * rot00 + v13 * rot01 + v23 * rot02;
-        self[4] =  v00 * rot10 + v10 * rot11 + v20 * rot12;
-        self[5] =  v01 * rot10 + v11 * rot11 + v21 * rot12;
-        self[6] =  v02 * rot10 + v12 * rot11 + v22 * rot12;
-        self[7] =  v03 * rot10 + v13 * rot11 + v23 * rot12;
-        self[8] =  v00 * rot20 + v10 * rot21 + v20 * rot22;
-        self[9] =  v01 * rot20 + v11 * rot21 + v21 * rot22;
+        self[0] = v00 * rot00 + v10 * rot01 + v20 * rot02;
+        self[1] = v01 * rot00 + v11 * rot01 + v21 * rot02;
+        self[2] = v02 * rot00 + v12 * rot01 + v22 * rot02;
+        self[3] = v03 * rot00 + v13 * rot01 + v23 * rot02;
+        self[4] = v00 * rot10 + v10 * rot11 + v20 * rot12;
+        self[5] = v01 * rot10 + v11 * rot11 + v21 * rot12;
+        self[6] = v02 * rot10 + v12 * rot11 + v22 * rot12;
+        self[7] = v03 * rot10 + v13 * rot11 + v23 * rot12;
+        self[8] = v00 * rot20 + v10 * rot21 + v20 * rot22;
+        self[9] = v01 * rot20 + v11 * rot21 + v21 * rot22;
         self[10] = v02 * rot20 + v12 * rot21 + v22 * rot22;
         self[11] = v03 * rot20 + v13 * rot21 + v23 * rot22;
 
