@@ -1,5 +1,6 @@
 #[cfg(feature = "Matrix4")]
 use crate::mat4::Mat4;
+use crate::slice_ops::*;
 #[cfg(feature = "Matrix4")]
 use crate::vector::MulVectorMatrix;
 use crate::vector::Vector;
@@ -19,72 +20,35 @@ impl Vector for Vec4 {
     }
 
     fn mul(mut self, rhs: &[f32]) -> Self::VectorType {
-        debug_assert!(rhs.len() >= 4);
-
-        self[0] *= rhs[0];
-        self[1] *= rhs[1];
-        self[2] *= rhs[2];
-        self[3] *= rhs[3];
-
+        mul(&mut self, rhs);
         self
     }
 
     fn add(mut self, rhs: &[f32]) -> Self::VectorType {
-        debug_assert!(rhs.len() >= 4);
-
-        self[0] += rhs[0];
-        self[1] += rhs[1];
-        self[2] += rhs[2];
-        self[3] += rhs[3];
-
+        add(&mut self, rhs);
         self
     }
 
     fn sub(mut self, rhs: &[f32]) -> Self::VectorType {
-        debug_assert!(rhs.len() >= 4);
-
-        self[0] -= rhs[0];
-        self[1] -= rhs[1];
-        self[2] -= rhs[2];
-        self[3] -= rhs[3];
-
+        sub(&mut self, rhs);
         self
     }
 
     fn scale(mut self, factor: f32) -> Self::VectorType {
-        self[0] *= factor;
-        self[1] *= factor;
-        self[2] *= factor;
-        self[3] *= factor;
-
+        scale(&mut self, factor);
         self
     }
 
     fn mag(&self) -> f32 {
-        self.mag2().sqrt()
+        mag(self)
     }
 
     fn mag2(&self) -> f32 {
-        let x = self[0];
-        let y = self[1];
-        let z = self[2];
-        let w = self[3];
-
-        x * x + y * y + z * z + w * w
+        mag2(self)
     }
 
     fn dot(&self, rhs: &[f32]) -> f32 {
-        let x1 = self[0];
-        let y1 = self[1];
-        let z1 = self[2];
-        let w1 = self[3];
-
-        let x2 = rhs[0];
-        let y2 = rhs[1];
-        let z2 = rhs[2];
-        let w2 = rhs[3];
-
-        x1 * x2 + y1 * y2 + z1 * z2 + w1 * w2
+        dot(self, rhs)
     }
 }
 
