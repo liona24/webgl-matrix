@@ -19,24 +19,28 @@ impl Vector for Vec3 {
         [1., 1., 1.]
     }
 
-    fn mul(mut self, rhs: &[f32]) -> Self::VectorType {
-        mul(&mut self, rhs);
-        self
+    fn mul(&self, rhs: &[f32]) -> Self::VectorType {
+        let mut dst = *self;
+        mul(&mut dst, rhs);
+        dst
     }
 
-    fn add(mut self, rhs: &[f32]) -> Self::VectorType {
-        add(&mut self, rhs);
-        self
+    fn add(&self, rhs: &[f32]) -> Self::VectorType {
+        let mut dst = *self;
+        add(&mut dst, rhs);
+        dst
     }
 
-    fn sub(mut self, rhs: &[f32]) -> Self::VectorType {
-        sub(&mut self, rhs);
-        self
+    fn sub(&self, rhs: &[f32]) -> Self::VectorType {
+        let mut dst = *self;
+        sub(&mut dst, rhs);
+        dst
     }
 
-    fn scale(mut self, factor: f32) -> Self::VectorType {
-        scale(&mut self, factor);
-        self
+    fn scale(&self, factor: f32) -> Self::VectorType {
+        let mut dst = *self;
+        scale(&mut dst, factor);
+        dst
     }
 
     fn mag(&self) -> f32 {
@@ -57,28 +61,28 @@ impl MulVectorMatrix for Vec3 {
     type VectorType = Vec3;
     type MatrixType = Mat3;
 
-    fn mul_matrix_left(mut self, lhs: &Self::MatrixType) -> Self::VectorType {
+    fn mul_matrix_left(&self, lhs: &Self::MatrixType) -> Self::VectorType {
         let x = self[0];
         let y = self[1];
         let z = self[2];
 
-        self[0] = lhs[0] * x + lhs[1] * y + lhs[2] * z;
-        self[1] = lhs[3] * x + lhs[4] * y + lhs[5] * z;
-        self[2] = lhs[6] * x + lhs[7] * y + lhs[8] * z;
-
-        self
+        [
+            lhs[0] * x + lhs[1] * y + lhs[2] * z,
+            lhs[3] * x + lhs[4] * y + lhs[5] * z,
+            lhs[6] * x + lhs[7] * y + lhs[8] * z,
+        ]
     }
 
-    fn mul_matrix(mut self, rhs: &Self::MatrixType) -> Self::VectorType {
+    fn mul_matrix(&self, rhs: &Self::MatrixType) -> Self::VectorType {
         let x = self[0];
         let y = self[1];
         let z = self[2];
 
-        self[0] = rhs[0] * x + rhs[3] * y + rhs[6] * z;
-        self[1] = rhs[1] * x + rhs[4] * y + rhs[7] * z;
-        self[2] = rhs[2] * x + rhs[5] * y + rhs[8] * z;
-
-        self
+        [
+            rhs[0] * x + rhs[3] * y + rhs[6] * z,
+            rhs[1] * x + rhs[4] * y + rhs[7] * z,
+            rhs[2] * x + rhs[5] * y + rhs[8] * z,
+        ]
     }
 }
 
@@ -105,6 +109,15 @@ mod tests {
 
         let c = b.mul_matrix(&a);
         assert_eq!(c, [150., 186., 222.]);
+    }
+
+    #[test]
+    fn vec3_is_immutable() {
+        let b = [2., 3., 4.];
+        let c = [3., 2., 3.];
+
+        let _d = b.add(&c);
+        assert_eq!(b, [2., 3., 4.]);
     }
 
     #[test]

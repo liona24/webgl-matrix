@@ -14,15 +14,15 @@ pub trait Vector {
     fn ones() -> Self::VectorType;
 
     /// Perform element-wise multiplication with the given right-hand-side operand
-    fn mul(self, rhs: &[f32]) -> Self::VectorType;
+    fn mul(&self, rhs: &[f32]) -> Self::VectorType;
 
     /// Perform element-wise addition with the given right-hand-side operand
-    fn add(self, rhs: &[f32]) -> Self::VectorType;
+    fn add(&self, rhs: &[f32]) -> Self::VectorType;
     /// Perform element-wise substraction with the given right-hand-side operand
-    fn sub(self, rhs: &[f32]) -> Self::VectorType;
+    fn sub(&self, rhs: &[f32]) -> Self::VectorType;
 
     /// Scale the vector elment-wise by the given constant
-    fn scale(self, factor: f32) -> Self::VectorType;
+    fn scale(&self, factor: f32) -> Self::VectorType;
 
     /// Calculate the magnitude of this vector
     fn mag(&self) -> f32;
@@ -42,9 +42,9 @@ pub trait MulVectorMatrix {
 
     /// Interprets `self` as a column vector and multiplies the given matrix
     /// from the left-hand-side, i.e. `lhs * self`
-    fn mul_matrix_left(self, lhs: &Self::MatrixType) -> Self::VectorType;
+    fn mul_matrix_left(&self, lhs: &Self::MatrixType) -> Self::VectorType;
 
     /// Interprets `self` as a row vector and multiplies the given matrix
     /// from the right-hand-side, i.e. `self * rhs`
-    fn mul_matrix(self, rhs: &Self::MatrixType) -> Self::VectorType;
+    fn mul_matrix(&self, rhs: &Self::MatrixType) -> Self::VectorType;
 }
