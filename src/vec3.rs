@@ -12,53 +12,7 @@ use std::f32;
 
 pub type Vec3 = [f32; 3];
 
-impl Vector for Vec3 {
-    type VectorType = Vec3;
-
-    fn zeros() -> Self::VectorType {
-        [0., 0., 0.]
-    }
-
-    fn ones() -> Self::VectorType {
-        [1., 1., 1.]
-    }
-
-    fn mul(&self, rhs: &[f32]) -> Self::VectorType {
-        let mut dst = *self;
-        mul(&mut dst, rhs);
-        dst
-    }
-
-    fn add(&self, rhs: &[f32]) -> Self::VectorType {
-        let mut dst = *self;
-        add(&mut dst, rhs);
-        dst
-    }
-
-    fn sub(&self, rhs: &[f32]) -> Self::VectorType {
-        let mut dst = *self;
-        sub(&mut dst, rhs);
-        dst
-    }
-
-    fn scale(&self, factor: f32) -> Self::VectorType {
-        let mut dst = *self;
-        scale(&mut dst, factor);
-        dst
-    }
-
-    fn mag(&self) -> f32 {
-        mag(self)
-    }
-
-    fn mag2(&self) -> f32 {
-        mag2(self)
-    }
-
-    fn dot(&self, rhs: &[f32]) -> f32 {
-        dot(self, rhs)
-    }
-}
+impl_vector!(Vec3, 3);
 
 #[cfg(feature = "Matrix3")]
 impl MulVectorMatrix<Mat3> for Vec3 {

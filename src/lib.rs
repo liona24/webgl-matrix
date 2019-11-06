@@ -1,4 +1,5 @@
 mod matrix;
+#[macro_use]
 mod vector;
 
 #[cfg(feature = "Vector3")]

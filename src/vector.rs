@@ -47,3 +47,54 @@ pub trait MulVectorMatrix<Matrix> {
     /// from the right-hand-side, i.e. `self * rhs`
     fn mul_matrix(&self, rhs: &Matrix) -> Self::VectorType;
 }
+
+macro_rules! impl_vector {
+    ($type:ty, $n:expr) => {
+        impl Vector for $type {
+            type VectorType = $type;
+            fn zeros() -> $type {
+                [0.; $n]
+            }
+
+            fn ones() -> $type {
+                [1.; $n]
+            }
+
+            fn mul(&self, rhs: &[f32]) -> $type {
+                let mut dst = *self;
+                mul(&mut dst, rhs);
+                dst
+            }
+
+            fn add(&self, rhs: &[f32]) -> $type {
+                let mut dst = *self;
+                add(&mut dst, rhs);
+                dst
+            }
+
+            fn sub(&self, rhs: &[f32]) -> $type {
+                let mut dst = *self;
+                sub(&mut dst, rhs);
+                dst
+            }
+
+            fn scale(&self, factor: f32) -> $type {
+                let mut dst = *self;
+                scale(&mut dst, factor);
+                dst
+            }
+
+            fn mag(&self) -> f32 {
+                mag(self)
+            }
+
+            fn mag2(&self) -> f32 {
+                mag2(self)
+            }
+
+            fn dot(&self, rhs: &[f32]) -> f32 {
+                dot(self, rhs)
+            }
+        }
+    };
+}
