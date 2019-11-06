@@ -26,7 +26,5 @@ jobs:
       displayName: 'Cargo Tests'
     - script: cargo tarpaulin --all-features --out Xml
       displayName: 'Code coverage'
-    - script: bash <(curl -s https://codecov.io/bash)
+    - script: bash <(curl -s https://codecov.io/bash) -t $CODE_COV_TOKEN
       displayName: 'Upload coverage'
-      env:
-        CODECOV_TOKEN: $( CODE_COV_TOKEN )
