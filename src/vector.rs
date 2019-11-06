@@ -36,15 +36,14 @@ pub trait Vector {
 
 #[cfg(any(feature = "Matrix4", feature = "Matrix3"))]
 /// Adds matrix operations to vector types.
-pub trait MulVectorMatrix {
+pub trait MulVectorMatrix<Matrix> {
     type VectorType;
-    type MatrixType;
 
     /// Interprets `self` as a column vector and multiplies the given matrix
     /// from the left-hand-side, i.e. `lhs * self`
-    fn mul_matrix_left(&self, lhs: &Self::MatrixType) -> Self::VectorType;
+    fn mul_matrix_left(&self, lhs: &Matrix) -> Self::VectorType;
 
     /// Interprets `self` as a row vector and multiplies the given matrix
     /// from the right-hand-side, i.e. `self * rhs`
-    fn mul_matrix(&self, rhs: &Self::MatrixType) -> Self::VectorType;
+    fn mul_matrix(&self, rhs: &Matrix) -> Self::VectorType;
 }

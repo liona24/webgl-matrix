@@ -57,11 +57,10 @@ impl Vector for Vec4 {
 }
 
 #[cfg(feature = "Matrix4")]
-impl MulVectorMatrix for Vec4 {
+impl MulVectorMatrix<Mat4> for Vec4 {
     type VectorType = Vec4;
-    type MatrixType = Mat4;
 
-    fn mul_matrix_left(&self, lhs: &Self::MatrixType) -> Self::VectorType {
+    fn mul_matrix_left(&self, lhs: &Mat4) -> Self::VectorType {
         let x = self[0];
         let y = self[1];
         let z = self[2];
@@ -75,7 +74,7 @@ impl MulVectorMatrix for Vec4 {
         ]
     }
 
-    fn mul_matrix(&self, rhs: &Self::MatrixType) -> Self::VectorType {
+    fn mul_matrix(&self, rhs: &Mat4) -> Self::VectorType {
         let x = self[0];
         let y = self[1];
         let z = self[2];

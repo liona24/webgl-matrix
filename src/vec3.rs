@@ -1,7 +1,11 @@
 #[cfg(feature = "Matrix3")]
 use crate::mat3::Mat3;
+#[cfg(feature = "Matrix4")]
+use crate::mat4::Mat4;
 use crate::slice_ops::*;
-#[cfg(feature = "Matrix3")]
+#[cfg(feature = "Matrix4")]
+use crate::vec4::Vec4;
+#[cfg(any(feature = "Matrix3", feature = "Matrix4"))]
 use crate::vector::MulVectorMatrix;
 use crate::vector::Vector;
 use std::f32;
@@ -57,11 +61,10 @@ impl Vector for Vec3 {
 }
 
 #[cfg(feature = "Matrix3")]
-impl MulVectorMatrix for Vec3 {
+impl MulVectorMatrix<Mat3> for Vec3 {
     type VectorType = Vec3;
-    type MatrixType = Mat3;
 
-    fn mul_matrix_left(&self, lhs: &Self::MatrixType) -> Self::VectorType {
+    fn mul_matrix_left(&self, lhs: &Mat3) -> Self::VectorType {
         let x = self[0];
         let y = self[1];
         let z = self[2];
@@ -73,7 +76,7 @@ impl MulVectorMatrix for Vec3 {
         ]
     }
 
-    fn mul_matrix(&self, rhs: &Self::MatrixType) -> Self::VectorType {
+    fn mul_matrix(&self, rhs: &Mat3) -> Self::VectorType {
         let x = self[0];
         let y = self[1];
         let z = self[2];
@@ -82,6 +85,43 @@ impl MulVectorMatrix for Vec3 {
             rhs[0] * x + rhs[3] * y + rhs[6] * z,
             rhs[1] * x + rhs[4] * y + rhs[7] * z,
             rhs[2] * x + rhs[5] * y + rhs[8] * z,
+        ]
+    }
+}
+
+#[cfg(feature = "Matrix4")]
+impl MulVectorMatrix<Mat4> for Vec3 {
+    type VectorType = Vec4;
+
+    /// Interprets `self` as a column vector with the 4th component equal to 1 and multiplies the given matrix
+    /// from the left-hand-side, i.e. `lhs * [...self, 1.0]`
+    fn mul_matrix_left(&self, lhs: &Mat4) -> Self::VectorType {
+        let x = self[0];
+        let y = self[1];
+        let z = self[2];
+        // let w = 1.0
+
+        [
+            lhs[0] * x + lhs[1] * y + lhs[2] * z + lhs[3],
+            lhs[4] * x + lhs[5] * y + lhs[6] * z + lhs[7],
+            lhs[8] * x + lhs[9] * y + lhs[10] * z + lhs[11],
+            lhs[12] * x + lhs[13] * y + lhs[14] * z + lhs[15],
+        ]
+    }
+
+    /// Interprets `self` as a row vector with the 4th component equal to 1 and multiplies the given matrix
+    /// from the right-hand-side, i.e. `[...self, 1.0] * rhs`
+    fn mul_matrix(&self, rhs: &Mat4) -> Self::VectorType {
+        let x = self[0];
+        let y = self[1];
+        let z = self[2];
+        // let w = 1.0;
+
+        [
+            rhs[0] * x + rhs[4] * y + rhs[8] * z + rhs[12],
+            rhs[1] * x + rhs[5] * y + rhs[9] * z + rhs[13],
+            rhs[2] * x + rhs[6] * y + rhs[10] * z + rhs[14],
+            rhs[3] * x + rhs[7] * y + rhs[11] * z + rhs[15],
         ]
     }
 }
@@ -109,6 +149,29 @@ mod tests {
 
         let c = b.mul_matrix(&a);
         assert_eq!(c, [150., 186., 222.]);
+    }
+    #[test]
+    #[cfg(feature = "Matrix4")]
+    fn vec3_mul_matrix4() {
+        let a = [
+            1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
+        ];
+        let b = [17., 18., 19.];
+
+        let c = b.mul_matrix(&a);
+        assert_eq!(c, [291., 346., 401., 456.]);
+    }
+
+    #[test]
+    #[cfg(feature = "Matrix4")]
+    fn vec3_mul_matrix4_left() {
+        let a = [
+            1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.,
+        ];
+        let b = [17., 18., 19.];
+
+        let c = b.mul_matrix_left(&a);
+        assert_eq!(c, [114., 334., 554., 774.]);
     }
 
     #[test]
