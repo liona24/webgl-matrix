@@ -1,6 +1,6 @@
 // we redfine it, because of no_std
 // pub const EPSILON : f32 = 1.19209290e-07_f32;
-pub const EPSILON : f32 = 1e-5_f32;
+pub const EPSILON: f32 = 1e-5_f32;
 
 /// Checks if two sequences of numbers are equal up to EPSILON precision.
 pub fn almost_eq(a: &[f32], b: &[f32]) -> bool {
