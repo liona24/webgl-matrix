@@ -22,9 +22,14 @@ mod mat4;
 #[cfg(feature = "Matrix4")]
 pub use mat4::{Mat4, ProjectionMatrix};
 
+#[cfg(any(feature = "Matrix4", feature = "Matrix3"))]
+pub use vector::MulVectorMatrix;
+
 #[cfg(feature = "SliceOps")]
 pub mod slice_ops;
 
 pub mod utils;
 pub use crate::matrix::Matrix;
 pub use crate::vector::Vector;
+
+pub mod prelude;
