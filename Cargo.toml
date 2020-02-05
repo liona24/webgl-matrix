@@ -5,6 +5,11 @@ authors = ["Lion Ackermann <ackerm.lion@hotmail.de>"]
 edition = "2018"
 license = "MIT"
 keywords = ["matrix", "webgl", "lightweight", "wasm"]
+readme = "README.md"
+documentation = "https://docs.rs/webgl-matrix"
+homepage = "https://github.com/liona24/webgl-matrix"
+repository = "https://github.com/liona24/webgl-matrix"
+description = "A lightweight matrix library targeting ease of use"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

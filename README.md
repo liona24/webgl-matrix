@@ -2,6 +2,7 @@ webgl-matrix
 ============
 
 [![Build Status](https://dev.azure.com/ackermlion/webgl-matrix/_apis/build/status/liona24.webgl-matrix?branchName=master)](https://dev.azure.com/ackermlion/webgl-matrix/_build/latest?definitionId=1&branchName=master)
+[![codecov](https://codecov.io/gh/liona24/webgl-matrix/branch/master/graph/badge.svg)](https://codecov.io/gh/liona24/webgl-matrix)
 
 ## Getting Started
 
@@ -41,7 +42,7 @@ fn main() {
     let e = c.add(&b);
 
     // Or fancier transformations
-    B.translate(&[1., 2., 3.])
+    B.translate(&[1., 2., 3.]);
 
     let A = Mat4::identity();
     // operate on slices
@@ -50,7 +51,7 @@ fn main() {
     // with automatic homogenous coordinate expansion
     let c = A.mul_vector(&b[0..=2]);
     // or using all four coordinates
-    let d = A.mul_vector(&b[3..len]);
+    let d = A.mul_vector(&b[3..]);
 
     // create projection matrices (left, right, bot, top, near, far)
     let P = Mat4::create_perspective_from_viewport(0., 1., 0., 1., 0.1, 10.);
