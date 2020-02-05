@@ -29,4 +29,4 @@ jobs:
     - script: bash <(curl -s https://codecov.io/bash)
       displayName: 'Upload coverage'
       env:
-        CODECOV_TOKEN: $(CODE_COV_TOKEN)
+        CODECOV_TOKEN: $(CODECOV_TOKEN)
