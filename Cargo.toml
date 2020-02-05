@@ -1,7 +1,7 @@
 [package]
 name = "webgl-matrix"
 version = "0.1.0"
-authors = ["Lion Ackermann <ackerm.lion@hotmail.de>"]
+authors = ["Lion Ackermann"]
 edition = "2018"
 license = "MIT"
 keywords = ["matrix", "webgl", "lightweight", "wasm"]
