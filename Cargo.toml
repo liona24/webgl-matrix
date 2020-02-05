@@ -4,14 +4,14 @@ version = "0.1.0"
 authors = ["Lion Ackermann <ackerm.lion@hotmail.de>"]
 edition = "2018"
 license = "MIT"
-keywords = ["matrix", "webgl", "lightweight", "wasm", "no-std"]
+keywords = ["matrix", "webgl", "lightweight", "wasm"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 
 [features]
-default = ["Matrix4", "Matrix3", "Vector3", "Vector4"]
+default = ["Matrix4", "Matrix3"]
 
 SliceOps = []
 Vector4 = ["SliceOps"]

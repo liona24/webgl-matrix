@@ -401,8 +401,8 @@ pub trait ProjectionMatrix {
     fn create_perspective_from_viewport(
         vp_left: f32,
         vp_right: f32,
-        vp_top: f32,
         vp_bot: f32,
+        vp_top: f32,
         near: f32,
         far: f32,
     ) -> Mat4;
@@ -410,8 +410,8 @@ pub trait ProjectionMatrix {
     fn create_orthogonal_from_viewport(
         vp_left: f32,
         vp_right: f32,
-        vp_top: f32,
         vp_bot: f32,
+        vp_top: f32,
         near: f32,
         far: f32,
     ) -> Mat4;
@@ -443,8 +443,8 @@ impl ProjectionMatrix for Mat4 {
     fn create_perspective_from_viewport(
         vp_left: f32,
         vp_right: f32,
-        vp_top: f32,
         vp_bot: f32,
+        vp_top: f32,
         near: f32,
         far: f32,
     ) -> Self {
@@ -475,8 +475,8 @@ impl ProjectionMatrix for Mat4 {
     fn create_orthogonal_from_viewport(
         vp_left: f32,
         vp_right: f32,
-        vp_top: f32,
         vp_bot: f32,
+        vp_top: f32,
         near: f32,
         far: f32,
     ) -> Self {
