@@ -80,6 +80,27 @@ impl MulVectorMatrix<Mat4> for Vec3 {
     }
 }
 
+pub trait CrossProduct {
+    fn cross(&self, v: &Vec3) -> Vec3;
+}
+
+impl CrossProduct for Vec3 {
+    fn cross(&self, v: &Self) -> Self {
+        let u = self;
+
+        /*
+         *  i  -j   k
+         * u[0] u[1] u[2]
+         * v[0] v[1] v[2]
+         */
+        [
+            u[1] * v[2] - u[2] * v[1],
+            u[2] * v[0] - u[0] * v[2],
+            u[0] * v[1] - u[1] * v[0],
+        ]
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -184,5 +205,29 @@ mod tests {
     fn vec3_mag2() {
         let b = [2., 3., 4.];
         assert!(almost_eq(&[b.mag2()], &[29.]));
+    }
+
+    #[test]
+    fn vec3_cross1() {
+        let a = [1., 0., 0.];
+        let b = [0., 1., 0.];
+
+        // Right-handed
+        assert_eq!(a.cross(&b), [0., 0., 1.]);
+
+        // Left-handed
+        assert_eq!(b.cross(&a), [0., 0., -1.]);
+    }
+
+    #[test]
+    fn vec3_cross2() {
+        let a = [2., 3., 4.];
+        let b = [5., 6., 7.];
+
+        // Right-handed
+        assert_eq!(a.cross(&b), [-3., 6., -3.]);
+
+        // Left-handed
+        assert_eq!(b.cross(&a), [3., -6., 3.]);
     }
 }
