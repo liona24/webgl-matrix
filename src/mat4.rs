@@ -3,6 +3,9 @@ use crate::utils::EPSILON;
 use crate::vec4::Vec4;
 use std::f32;
 
+#[cfg(feature = "Vector3")]
+use crate::vec3::Vec3;
+
 pub type Mat4 = [f32; 16];
 
 impl Matrix for Mat4 {
@@ -505,6 +508,68 @@ impl ProjectionMatrix for Mat4 {
     }
 }
 
+#[cfg(feature = "Vector3")]
+pub trait ViewMatrix {
+    fn look_at_lh(eye: &Vec3, target: &Vec3, up: &Vec3) -> Mat4;
+    fn look_at_rh(eye: &Vec3, target: &Vec3, up: &Vec3) -> Mat4;
+}
+
+// Just a helper function
+#[cfg(feature = "Vector3")]
+fn view_matrix(eye: &Vec3, z: &Vec3, up: &Vec3) -> Mat4 {
+    use crate::vec3::CrossProduct;
+    use crate::Vector;
+
+    let z_mag = z.mag();
+    if z_mag < EPSILON {
+        // The eye is on the target, do not transform
+        return Mat4::identity();
+    }
+
+    let zn = z.scale(1.0 / z_mag);
+
+    let x = up.cross(&zn);
+    let x_mag = x.mag();
+    debug_assert!(x_mag > EPSILON);
+
+    let xn = x.scale(1.0 / x_mag);
+    let yn = zn.cross(&xn);
+    [
+        xn[0],
+        yn[0],
+        zn[0],
+        0.0,
+        xn[1],
+        yn[1],
+        zn[1],
+        0.0,
+        xn[2],
+        yn[2],
+        zn[2],
+        0.0,
+        -xn.dot(eye),
+        -yn.dot(eye),
+        -zn.dot(eye),
+        1.0,
+    ]
+}
+
+#[cfg(feature = "Vector3")]
+impl ViewMatrix for Mat4 {
+    fn look_at_lh(eye: &Vec3, target: &Vec3, up: &Vec3) -> Self {
+        use crate::Vector;
+        let z = target.sub(eye);
+        view_matrix(eye, &z, &up)
+    }
+
+    fn look_at_rh(eye: &Vec3, target: &Vec3, up: &Vec3) -> Self {
+        use crate::Vector;
+
+        let z = eye.sub(target);
+        view_matrix(eye, &z, &up)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -758,5 +823,43 @@ mod tests {
 
         let r = m.mul_vector_left(&v);
         assert!(almost_eq(&r, &[-3., -1., 5., 1.]));
+    }
+
+    #[test]
+    fn mat4_look_at_rh() {
+        let eye = [0., 0., 1.];
+        let target = [0., 0., 0.];
+        let up = [0., 1., 0.];
+
+        let mut expected_view = Mat4::identity();
+        expected_view[14] = -1.;
+
+        assert_eq!(Mat4::look_at_rh(&eye, &target, &up), expected_view);
+
+        // Test case where the eye is on the target
+        assert_eq!(
+            Mat4::look_at_rh(&[0., 0., 0.], &target, &up),
+            Mat4::identity()
+        );
+    }
+
+    #[test]
+    fn mat4_look_at_lh() {
+        let eye = [0., 0., 1.];
+        let target = [0., 0., 0.];
+        let up = [0., 1., 0.];
+
+        let mut expected_view = Mat4::identity();
+        expected_view[0] = -1.;
+        expected_view[10] = -1.;
+        expected_view[14] = 1.;
+
+        assert_eq!(Mat4::look_at_lh(&eye, &target, &up), expected_view);
+
+        // Test case where the eye is on the target
+        assert_eq!(
+            Mat4::look_at_rh(&[0., 0., 0.], &target, &up),
+            Mat4::identity()
+        );
     }
 }
