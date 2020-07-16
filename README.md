@@ -8,7 +8,7 @@ webgl-matrix
 
 This is a lightweight matrix / vector library meant for usage with WebGL.
 
-At the core this library only consists of the traits `Matrix` and `Vector`. All implementations are optional features and can be added as needed.
+At the core this library only consists of the traits `Matrix` and `Vector`.
 
 Available features:
 * `Matrix4`: 4x4 matrix operations (includes *Vector4*)
